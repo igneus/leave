@@ -8,19 +8,21 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public class TimeParserTest {
-    private ZonedDateTime currentTime;
+    private ZonedDateTime currentTime, zeroSecondsTime;
     private TimeParser subject;
 
     @Before
     public void setUp() {
-        this.currentTime = ZonedDateTime.of(2001, 1, 1, 9, 0, 0, 0, ZoneId.of("UTC"));
+        this.currentTime = ZonedDateTime.of(2001, 1, 1, 9, 5, 28, 0, ZoneId.of("UTC"));
         this.subject = new TimeParser(this.currentTime);
+
+        this.zeroSecondsTime = this.currentTime.withSecond(0);
     }
 
     @Test
     public void timeAfterCurrentTime() {
         assertEquals(
-                this.currentTime
+                this.zeroSecondsTime
                         .withHour(11)
                         .withMinute(22),
                 this.subject.parse("1122")
@@ -30,7 +32,7 @@ public class TimeParserTest {
     @Test
     public void timeBeforeCurrentTime() {
         assertEquals(
-                this.currentTime
+                this.zeroSecondsTime
                         .plusDays(1) // 05:07 never more available today, assume yesterday
                         .withHour(5)
                         .withMinute(7),
@@ -41,7 +43,7 @@ public class TimeParserTest {
     @Test
     public void minValidTime() {
         assertEquals(
-                this.currentTime
+                this.zeroSecondsTime
                         .plusDays(1)
                         .withHour(0)
                         .withMinute(0),
@@ -52,7 +54,7 @@ public class TimeParserTest {
     @Test
     public void maxValidTime() {
         assertEquals(
-                this.currentTime
+                this.zeroSecondsTime
                         .withHour(23)
                         .withMinute(59),
                 this.subject.parse("2359")

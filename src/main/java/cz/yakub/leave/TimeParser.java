@@ -6,7 +6,7 @@ public class TimeParser {
     private ZonedDateTime currentTime;
 
     public TimeParser() {
-        this.currentTime = ZonedDateTime.now();
+        this(ZonedDateTime.now());
     }
 
     public TimeParser(ZonedDateTime currentTime) {
@@ -28,7 +28,7 @@ public class TimeParser {
             throw new InvalidTimeStringException();
         }
 
-        ZonedDateTime time = this.currentTime.withHour(hour).withMinute(minute);
+        ZonedDateTime time = this.currentTime.withHour(hour).withMinute(minute).withSecond(0);
 
         if (time.isBefore(this.currentTime)) {
             return time.plusDays(1);
