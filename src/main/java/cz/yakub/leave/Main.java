@@ -22,7 +22,7 @@ public class Main {
 
         System.out.println("Time to leave!");
 
-        // TODO: reminders that time to leave has been passed
+        displayReminders();
     }
 
     private static void displayAlarmTime(ZonedDateTime alarmTime) {
@@ -30,5 +30,14 @@ public class Main {
             System.out.println("WARNING: setting alarm out of bounds of the current day");
         }
         System.out.println("Alarm set for " + alarmTime.format(DateTimeFormatter.RFC_1123_DATE_TIME) + ".");
+    }
+
+    private static void displayReminders() throws InterruptedException {
+        int sleepMinutes = 5, passed = 0;
+        while (true) {
+            Thread.sleep(sleepMinutes * 60 * 1000);
+            passed += sleepMinutes;
+            System.out.println("You planned to leave " + passed + " minutes ago.");
+        }
     }
 }
