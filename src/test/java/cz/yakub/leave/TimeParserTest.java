@@ -14,11 +14,63 @@ public class TimeParserTest {
     @Before
     public void setUp() {
         this.currentTime = ZonedDateTime.of(2001, 1, 1, 9, 0, 0, 0, ZoneId.of("UTC"));
-        this.subject = new TimeParser();
+        this.subject = new TimeParser(this.currentTime);
     }
 
     @Test
-    public void returnsZonedDateTime() {
-        assertEquals(this.currentTime.withHour(10), this.subject.parse("1000"));
+    public void timeAfterCurrentTime() {
+        assertEquals(
+                this.currentTime
+                        .withHour(11)
+                        .withMinute(22),
+                this.subject.parse("1122")
+        );
+    }
+
+    @Test
+    public void timeBeforeCurrentTime() {
+        assertEquals(
+                this.currentTime
+                        .plusDays(1) // 05:07 never more available today, assume yesterday
+                        .withHour(5)
+                        .withMinute(7),
+                this.subject.parse("0507")
+        );
+    }
+
+    @Test
+    public void minValidTime() {
+        assertEquals(
+                this.currentTime
+                        .plusDays(1)
+                        .withHour(0)
+                        .withMinute(0),
+                this.subject.parse("0000")
+        );
+    }
+
+    @Test
+    public void maxValidTime() {
+        assertEquals(
+                this.currentTime
+                        .withHour(23)
+                        .withMinute(59),
+                this.subject.parse("2359")
+        );
+    }
+
+    @Test(expected = InvalidTimeStringException.class)
+    public void invalidHour() {
+        this.subject.parse("2400");
+    }
+
+    @Test(expected = InvalidTimeStringException.class)
+    public void invalidMinute() {
+        this.subject.parse("0160");
+    }
+
+    @Test(expected = InvalidTimeStringException.class)
+    public void nonNumericTimeString() {
+        this.subject.parse("abcd");
     }
 }
