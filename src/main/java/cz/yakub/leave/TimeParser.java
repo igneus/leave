@@ -17,6 +17,31 @@ public class TimeParser {
     }
 
     public ZonedDateTime parse(String timeString) {
+        if (timeString.substring(0, 1).equals("+")) {
+            return parseRelative(timeString.substring(1));
+        }
+
+        return parseAbsolute(timeString);
+    }
+
+    private ZonedDateTime parseRelative(String timeString) {
+        int hour, minute;
+
+        try {
+            hour = Integer.parseInt(timeString.substring(0, 2));
+            minute = Integer.parseInt(timeString.substring(2, 4));
+        } catch (NumberFormatException e) {
+            throw new InvalidTimeStringException();
+        }
+
+        if (hour < 0 || minute < 0) {
+            throw new InvalidTimeStringException();
+        }
+
+        return this.currentTime.plusHours(hour).plusMinutes(minute).withSecond(0);
+    }
+
+    private ZonedDateTime parseAbsolute(String timeString) {
         int hour, minute;
 
         try {

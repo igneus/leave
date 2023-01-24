@@ -75,4 +75,32 @@ public class TimeParserTest {
     public void nonNumericTimeString() {
         this.subject.parse("abcd");
     }
+
+    @Test
+    public void relativeTime() {
+        assertEquals(
+                this.zeroSecondsTime
+                        .plusHours(1)
+                        .plusMinutes(1),
+                this.subject.parse("+0101")
+        );
+    }
+
+    @Test
+    public void minRelativeTime() {
+        assertEquals(
+                this.zeroSecondsTime,
+                this.subject.parse("+0000")
+        );
+    }
+
+    @Test
+    public void maxRelativeTime() {
+        assertEquals(
+                this.zeroSecondsTime
+                        .plusHours(99)
+                        .plusMinutes(99),
+                this.subject.parse("+9999")
+        );
+    }
 }
