@@ -51,6 +51,7 @@ public class GuiMain {
         popup.add(timeLeftItem);
         MenuItem aboutItem = new MenuItem("About");
         popup.add(aboutItem);
+        popup.addSeparator();
         MenuItem exitItem = new MenuItem("Exit");
         popup.add(exitItem);
         trayIcon.setPopupMenu(popup);
