@@ -2,6 +2,9 @@ package cz.yakub.leave;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Parses time strings accepted by the CLI.
+ */
 public class TimeParser {
     private ZonedDateTime currentTime;
 
