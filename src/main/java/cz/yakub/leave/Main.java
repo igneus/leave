@@ -1,18 +1,21 @@
 package cz.yakub.leave;
 
+import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ResourceBundle;
 
 /**
  * Implementation of the traditional CLI 'leave' utility.
  * Default entrypoint of the application.
  */
 public class Main {
+    private static ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
 
     public static void main(String[] args) throws InterruptedException {
         if (args.length < 1) {
-            System.err.println("Please specify alarm time");
+            System.err.println(messages.getString("time_missing"));
             System.exit(1);
         }
 
@@ -20,21 +23,21 @@ public class Main {
         try {
             alarmTime = (new TimeParser()).parse(args[0]);
         } catch (InvalidTimeStringException e) {
-            System.err.println("Time string invalid. Please provide valid time in the HHMM format.");
+            System.err.println(messages.getString("time_invalid"));
             System.exit(1);
         }
         displayAlarmTime(alarmTime);
 
         waitForAlarm(alarmTime);
-        System.out.println("Time to leave!");
+        System.out.println(messages.getString("alarm"));
         displayReminders();
     }
 
     private static void displayAlarmTime(ZonedDateTime alarmTime) {
         if (alarmTime.getDayOfMonth() != ZonedDateTime.now().getDayOfMonth()) {
-            System.out.println("WARNING: alarm time past midnight");
+            System.out.println(messages.getString("time_tomorrow"));
         }
-        System.out.println("Alarm set for " + alarmTime.format(DateTimeFormatter.RFC_1123_DATE_TIME) + ".");
+        System.out.println(MessageFormat.format(messages.getString("alarm_set"), alarmTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)));
     }
 
     private static void waitForAlarm(ZonedDateTime alarmTime) throws InterruptedException {
@@ -45,7 +48,7 @@ public class Main {
             }
 
             sleepUntil(alarmTime.minusMinutes(i));
-            System.out.println("Leaving in " + i + " minutes.");
+            System.out.println(MessageFormat.format(messages.getString("advance_notice"), i));
         }
 
         sleepUntil(alarmTime);
@@ -61,7 +64,7 @@ public class Main {
         while (true) {
             Thread.sleep(sleepMinutes * 60 * 1000);
             passed += sleepMinutes;
-            System.out.println("You planned to leave " + passed + " minutes ago.");
+            System.out.println(MessageFormat.format(messages.getString("reminder"), passed));
         }
     }
 }

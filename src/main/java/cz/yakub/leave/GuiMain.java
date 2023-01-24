@@ -4,9 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
 /**
@@ -14,10 +16,11 @@ import java.util.stream.IntStream;
  */
 public class GuiMain {
     final private static String appName = "leave";
+    private static ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Please specify alarm time");
+            System.err.println(messages.getString("time_missing"));
             System.exit(1);
         }
 
@@ -25,7 +28,7 @@ public class GuiMain {
         try {
             alarmTime = (new TimeParser()).parse(args[0]);
         } catch (InvalidTimeStringException e) {
-            System.err.println("Time string invalid. Please provide valid time in the HHMM format.");
+            System.err.println(messages.getString("time_invalid"));
             System.exit(1);
         }
 
@@ -112,7 +115,7 @@ public class GuiMain {
             Timer noticeTimer = new Timer(0, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     trayIcon.displayMessage(appName,
-                            "Leaving in " + i + " minutes.", TrayIcon.MessageType.INFO);
+                            MessageFormat.format(messages.getString("advance_notice"), i), TrayIcon.MessageType.INFO);
                 }
             });
             noticeTimer.setInitialDelay((int) ZonedDateTime.now().until(noticeTime, ChronoUnit.MILLIS));
@@ -140,7 +143,7 @@ public class GuiMain {
             public void actionPerformed(ActionEvent e) {
                 trayIcon.setImage(iconProvider.getRed());
                 trayIcon.displayMessage(appName,
-                        "Time to leave!", TrayIcon.MessageType.WARNING);
+                        messages.getString("alarm"), TrayIcon.MessageType.WARNING);
             }
         });
         alarmTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS));
@@ -154,7 +157,7 @@ public class GuiMain {
             public void actionPerformed(ActionEvent e) {
                 long passed = alarmTime.until(ZonedDateTime.now(), ChronoUnit.MINUTES);
                 trayIcon.displayMessage(appName,
-                        "You planned to leave " + passed + " minutes ago.", TrayIcon.MessageType.WARNING);
+                        MessageFormat.format(messages.getString("reminder"), passed), TrayIcon.MessageType.WARNING);
             }
         });
         reminderTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime.plusMinutes(5), ChronoUnit.MILLIS));
