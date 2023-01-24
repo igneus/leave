@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         if (args.length < 1) {
-            System.err.println("Please specify time");
+            System.err.println("Please specify alarm time");
             System.exit(1);
         }
 
@@ -27,7 +27,7 @@ public class Main {
 
     private static void displayAlarmTime(ZonedDateTime alarmTime) {
         if (alarmTime.getDayOfMonth() != ZonedDateTime.now().getDayOfMonth()) {
-            System.out.println("WARNING: setting alarm out of bounds of the current day");
+            System.out.println("WARNING: alarm time past midnight");
         }
         System.out.println("Alarm set for " + alarmTime.format(DateTimeFormatter.RFC_1123_DATE_TIME) + ".");
     }
