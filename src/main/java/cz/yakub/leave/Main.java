@@ -13,15 +13,10 @@ public class Main {
         }
 
         ZonedDateTime alarmTime = (new TimeParser()).parse(args[0]);
-        Main.displayAlarmTime(alarmTime);
+        displayAlarmTime(alarmTime);
 
-        long milliseconds = ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS);
-        Thread.sleep(milliseconds);
-
-        // TODO: reminders that time to leave is approaching
-
+        waitForAlarm(alarmTime);
         System.out.println("Time to leave!");
-
         displayReminders();
     }
 
@@ -30,6 +25,25 @@ public class Main {
             System.out.println("WARNING: alarm time past midnight");
         }
         System.out.println("Alarm set for " + alarmTime.format(DateTimeFormatter.RFC_1123_DATE_TIME) + ".");
+    }
+
+    private static void waitForAlarm(ZonedDateTime alarmTime) throws InterruptedException {
+        int[] advanceNotices = {15, 10, 5, 2};
+        for (int i: advanceNotices) {
+            if (alarmTime.minusMinutes(i).isBefore(ZonedDateTime.now())) {
+                continue;
+            }
+
+            sleepUntil(alarmTime.minusMinutes(i));
+            System.out.println("Leaving in " + i + " minutes.");
+        }
+
+        sleepUntil(alarmTime);
+    }
+
+    private static void sleepUntil(ZonedDateTime alarmTime) throws InterruptedException {
+        long milliseconds = ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS);
+        Thread.sleep(milliseconds);
     }
 
     private static void displayReminders() throws InterruptedException {
