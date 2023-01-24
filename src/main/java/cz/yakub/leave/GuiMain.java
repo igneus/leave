@@ -42,10 +42,11 @@ public class GuiMain {
     }
 
     private static void createAndShowGUI(ZonedDateTime alarmTime) {
-        final TrayIcon trayIcon =
-                new TrayIcon(IconProvider.getGreen());
         final SystemTray tray = SystemTray.getSystemTray();
+        final IconProvider icons = new IconProvider(tray.getTrayIconSize());
 
+        final TrayIcon trayIcon =
+                new TrayIcon(icons.getGreen());
         final PopupMenu popup = new PopupMenu();
         MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");
         popup.add(timeLeftItem);
@@ -78,8 +79,8 @@ public class GuiMain {
         });
 
         regularlyUpdateTimeLeft(alarmTime, timeLeftItem);
-        scheduleAdvanceNotices(alarmTime, trayIcon);
-        scheduleAlarm(alarmTime, trayIcon);
+        scheduleAdvanceNotices(alarmTime, trayIcon, icons);
+        scheduleAlarm(alarmTime, trayIcon, icons);
         scheduleReminders(alarmTime, trayIcon);
     }
 
@@ -96,7 +97,7 @@ public class GuiMain {
         timeLeftTimer.start();
     }
 
-    private static void scheduleAdvanceNotices(ZonedDateTime alarmTime, TrayIcon trayIcon) {
+    private static void scheduleAdvanceNotices(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
         int[] advanceNotices = {15, 10, 5, 2}; // TODO: duplicate code
         for (int i : advanceNotices) {
             ZonedDateTime noticeTime = alarmTime.minusMinutes(i);
@@ -106,7 +107,7 @@ public class GuiMain {
 
             Timer noticeTimer = new Timer(0, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    trayIcon.setImage(IconProvider.getOrange());
+                    trayIcon.setImage(iconProvider.getOrange());
                     trayIcon.displayMessage(appName,
                             "Leaving in " + i + " minutes.", TrayIcon.MessageType.INFO);
                 }
@@ -117,10 +118,10 @@ public class GuiMain {
         }
     }
 
-    private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon) {
+    private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
         Timer alarmTimer = new Timer(0, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                trayIcon.setImage(IconProvider.getRed());
+                trayIcon.setImage(iconProvider.getRed());
                 trayIcon.displayMessage(appName,
                         "Time to leave!", TrayIcon.MessageType.WARNING);
             }

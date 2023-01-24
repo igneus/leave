@@ -1,29 +1,34 @@
 package cz.yakub.leave;
 
-import javax.swing.*;
 import java.awt.*;
-import java.net.URL;
+import java.awt.image.BufferedImage;
 
 public class IconProvider {
-    public static Image getGreen() {
-        return load("images/icon_green.png");
+    private Dimension dimension;
+
+    public IconProvider(Dimension dimension) {
+        this.dimension = dimension;
     }
 
-    public static Image getOrange() {
-        return load("images/icon_orange.png");
+    public Image getGreen() {
+        return create(Color.green);
     }
 
-    public static Image getRed() {
-        return load("images/icon_red.png");
+    public Image getOrange() {
+        return create(Color.orange);
     }
 
-    private static Image load(String filename) {
-        URL imageURL = IconProvider.class.getResource(filename);
+    public Image getRed() {
+        return create(Color.red);
+    }
 
-        if (imageURL == null) {
-            throw new RuntimeException("Resource not found");
-        }
+    private Image create(Color color) {
+        BufferedImage bufferedImage = new BufferedImage((int) dimension.getWidth(), (int) dimension.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.setColor(color);
+        g2d.fillRect(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight());
+        g2d.dispose();
 
-        return new ImageIcon(imageURL, "tray icon").getImage();
+        return bufferedImage;
     }
 }
