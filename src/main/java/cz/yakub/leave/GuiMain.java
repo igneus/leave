@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Alternative entrypoint running the 'leave' utility as a GUI application.
+ */
 public class GuiMain {
     final private static String appName = "leave";
 

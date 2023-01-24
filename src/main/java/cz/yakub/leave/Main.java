@@ -4,6 +4,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Implementation of the traditional CLI 'leave' utility.
+ * Default entrypoint of the application.
+ */
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
