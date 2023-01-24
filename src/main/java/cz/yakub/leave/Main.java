@@ -12,7 +12,13 @@ public class Main {
             System.exit(1);
         }
 
-        ZonedDateTime alarmTime = (new TimeParser()).parse(args[0]);
+        ZonedDateTime alarmTime = ZonedDateTime.now();
+        try {
+            alarmTime = (new TimeParser()).parse(args[0]);
+        } catch (InvalidTimeStringException e) {
+            System.err.println("Time string invalid. Please provide valid time in the HHMM format.");
+            System.exit(1);
+        }
         displayAlarmTime(alarmTime);
 
         waitForAlarm(alarmTime);
