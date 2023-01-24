@@ -1,6 +1,9 @@
 package cz.yakub.leave;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Parses time strings accepted by the CLI.
@@ -25,43 +28,36 @@ public class TimeParser {
     }
 
     private ZonedDateTime parseRelative(String timeString) {
-        int hour, minute;
+        LocalTime parsedTime = parseLocalTime(timeString);
 
-        try {
-            hour = Integer.parseInt(timeString.substring(0, 2));
-            minute = Integer.parseInt(timeString.substring(2, 4));
-        } catch (NumberFormatException e) {
-            throw new InvalidTimeStringException();
-        }
-
-        if (hour < 0 || minute < 0) {
-            throw new InvalidTimeStringException();
-        }
-
-        return this.currentTime.plusHours(hour).plusMinutes(minute).withSecond(0);
+        return this.currentTime
+                .plusHours(parsedTime.getHour())
+                .plusMinutes(parsedTime.getMinute())
+                .withSecond(0);
     }
 
     private ZonedDateTime parseAbsolute(String timeString) {
-        int hour, minute;
-
-        try {
-            hour = Integer.parseInt(timeString.substring(0, 2));
-            minute = Integer.parseInt(timeString.substring(2, 4));
-        } catch (NumberFormatException e) {
-            throw new InvalidTimeStringException();
-        }
-
-        if (hour < 0 || hour >= 24 ||
-                minute < 0 || minute >= 60) {
-            throw new InvalidTimeStringException();
-        }
-
-        ZonedDateTime time = this.currentTime.withHour(hour).withMinute(minute).withSecond(0);
+        LocalTime parsedTime = parseLocalTime(timeString);
+        ZonedDateTime time =
+                this.currentTime
+                        .withHour(parsedTime.getHour())
+                        .withMinute(parsedTime.getMinute())
+                        .withSecond(0);
 
         if (time.isBefore(this.currentTime)) {
             return time.plusDays(1);
         }
 
         return time;
+    }
+
+    private LocalTime parseLocalTime(String timeString) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("HHmm");
+
+        try {
+            return LocalTime.parse(timeString, format);
+        } catch (DateTimeParseException e) {
+            throw new InvalidTimeStringException();
+        }
     }
 }

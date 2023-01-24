@@ -63,7 +63,7 @@ public class TimeParserTest {
 
     @Test(expected = InvalidTimeStringException.class)
     public void invalidHour() {
-        this.subject.parse("2400");
+        this.subject.parse("2500");
     }
 
     @Test(expected = InvalidTimeStringException.class)
@@ -98,9 +98,9 @@ public class TimeParserTest {
     public void maxRelativeTime() {
         assertEquals(
                 this.zeroSecondsTime
-                        .plusHours(99)
-                        .plusMinutes(99),
-                this.subject.parse("+9999")
+                        .plusHours(23)
+                        .plusMinutes(59),
+                this.subject.parse("+2359")
         );
     }
 }
