@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Alternative entrypoint running the 'leave' utility as a GUI application.
@@ -99,15 +101,16 @@ public class GuiMain {
 
     private static void scheduleAdvanceNotices(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
         int[] advanceNotices = {15, 10, 5, 2}; // TODO: duplicate code
-        for (int i : advanceNotices) {
+        int[] actualAdvanceNotices =
+                Arrays.stream(advanceNotices)
+                        .filter(x -> alarmTime.minusMinutes(x).isAfter(ZonedDateTime.now()))
+                        .toArray();
+
+        for (int i : actualAdvanceNotices) {
             ZonedDateTime noticeTime = alarmTime.minusMinutes(i);
-            if (noticeTime.isBefore(ZonedDateTime.now())) {
-                continue;
-            }
 
             Timer noticeTimer = new Timer(0, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    trayIcon.setImage(iconProvider.getOrange());
                     trayIcon.displayMessage(appName,
                             "Leaving in " + i + " minutes.", TrayIcon.MessageType.INFO);
                 }
@@ -116,6 +119,20 @@ public class GuiMain {
             noticeTimer.setRepeats(false);
             noticeTimer.start();
         }
+
+        // update icon every minute
+        IntStream.rangeClosed(1, actualAdvanceNotices[0]).forEach(i -> {
+            ZonedDateTime noticeTime = alarmTime.minusMinutes(i);
+
+            Timer iconTimer = new Timer(0, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
+                }
+            });
+            iconTimer.setInitialDelay((int) ZonedDateTime.now().until(noticeTime, ChronoUnit.MILLIS));
+            iconTimer.setRepeats(false);
+            iconTimer.start();
+        });
     }
 
     private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
