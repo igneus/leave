@@ -10,4 +10,8 @@ as specified in [this FreeBSD man page][manpage].
 
 `$ mvn test`
 
+## License
+
+GNU/GPL 3.0
+
 [manpage]: https://www.freebsd.org/cgi/man.cgi?query=leave
