@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -89,8 +90,7 @@ public class GuiMain {
     }
 
     private static void regularlyUpdateTimeLeft(ZonedDateTime alarmTime, MenuItem timeLeftItem) {
-        final int everyMinute = 60 * 1000;
-        Timer timeLeftTimer = new Timer(everyMinute, new ActionListener() {
+        Timer timeLeftTimer = new Timer(minutes(1), new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 long minutes = ZonedDateTime.now().until(alarmTime, ChronoUnit.MINUTES);
                 timeLeftItem.setLabel(Math.abs(minutes) + " minutes " +
@@ -123,8 +123,7 @@ public class GuiMain {
         }
 
         // every minute update the orange icon with current time left
-        final int everyMinute = 60 * 1000;
-        Timer iconTimer = new Timer(everyMinute, null);
+        Timer iconTimer = new Timer(minutes(1), null);
         iconTimer.addActionListener(new ActionListener() {
             private int i = actualAdvanceNotices[0];
 
@@ -155,8 +154,7 @@ public class GuiMain {
     }
 
     private static void scheduleReminders(ZonedDateTime alarmTime, TrayIcon trayIcon) {
-        final int everyFiveMinutes = 5 * 60 * 1000;
-        Timer reminderTimer = new Timer(everyFiveMinutes, new ActionListener() {
+        Timer reminderTimer = new Timer(minutes(5), new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 long passed = alarmTime.until(ZonedDateTime.now(), ChronoUnit.MINUTES);
                 trayIcon.displayMessage(appName,
@@ -165,5 +163,12 @@ public class GuiMain {
         });
         reminderTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime.plusMinutes(5), ChronoUnit.MILLIS));
         reminderTimer.start();
+    }
+
+    /**
+     * Computes specified amount of minutes in the format expected by the Timer constructor.
+     */
+    private static int minutes(int mins) {
+        return (int) Duration.ofMinutes(mins).toMillis();
     }
 }
