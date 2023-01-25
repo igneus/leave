@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.ResourceBundle;
-import java.util.stream.IntStream;
 
 /**
  * Alternative entrypoint running the 'leave' utility as a GUI application.
@@ -123,19 +122,23 @@ public class GuiMain {
             noticeTimer.start();
         }
 
-        // update icon every minute
-        IntStream.rangeClosed(1, actualAdvanceNotices[0]).forEach(i -> {
-            ZonedDateTime noticeTime = alarmTime.minusMinutes(i);
+        // every minute update the orange icon with current time left
+        final int everyMinute = 60 * 1000;
+        Timer iconTimer = new Timer(everyMinute, null);
+        iconTimer.addActionListener(new ActionListener() {
+            private int i = actualAdvanceNotices[0];
 
-            Timer iconTimer = new Timer(0, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
+            public void actionPerformed(ActionEvent e) {
+                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
+
+                i--;
+                if (i == 0) {
+                    iconTimer.stop();
                 }
-            });
-            iconTimer.setInitialDelay((int) ZonedDateTime.now().until(noticeTime, ChronoUnit.MILLIS));
-            iconTimer.setRepeats(false);
-            iconTimer.start();
+            }
         });
+        iconTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime.minusMinutes(actualAdvanceNotices[0]), ChronoUnit.MILLIS));
+        iconTimer.start();
     }
 
     private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
