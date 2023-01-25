@@ -11,33 +11,28 @@ public class IconProvider {
     }
 
     public Image getGreen() {
-        return create(Color.green);
+        return create(Color.green, "L");
     }
 
     public Image getOrange(String minutesLeft) {
-        BufferedImage image = create(Color.orange);
-        addText(image, minutesLeft);
-        return image;
+        return create(Color.orange, minutesLeft);
     }
 
     public Image getRed() {
-        return create(Color.red);
+        return create(Color.red, "L");
     }
 
-    private BufferedImage create(Color color) {
+    private BufferedImage create(Color color, String text) {
         BufferedImage bufferedImage = new BufferedImage((int) dimension.getWidth(), (int) dimension.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = bufferedImage.createGraphics();
         g2d.setColor(color);
         g2d.fillRect(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight());
+
+        g2d.setColor(Color.black);
+        g2d.drawString(text, 1, bufferedImage.getHeight() / 2);
+
         g2d.dispose();
 
         return bufferedImage;
-    }
-
-    private void addText(BufferedImage bufferedImage, String text) {
-        Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.setColor(Color.black);
-        g2d.drawString(text, 1, bufferedImage.getHeight() / 2);
-        g2d.dispose();
     }
 }
