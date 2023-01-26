@@ -11,7 +11,7 @@ public class IconProvider {
     }
 
     public Image getGreen() {
-        return create(Color.green, "L");
+        return create(new Color(149, 205, 65), "L");
     }
 
     public Image getOrange(String minutesLeft) {
@@ -28,7 +28,7 @@ public class IconProvider {
         g2d.setColor(color);
         g2d.fillRect(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight());
 
-        g2d.setColor(Color.black);
+        g2d.setColor(color.darker().darker());
         g2d.drawString(text, 1, bufferedImage.getHeight() / 2);
 
         g2d.dispose();
