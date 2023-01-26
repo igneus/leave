@@ -95,12 +95,22 @@ public class GuiMain {
         Timer timeLeftTimer = new Timer(minutes(1), new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 long minutes = ZonedDateTime.now().until(alarmTime, ChronoUnit.MINUTES);
-                timeLeftItem.setLabel(Math.abs(minutes) + " minutes " +
-                        (minutes >= 0 ? "left" : "past the planned leave time"));
+                timeLeftItem.setLabel(formatMinutesLeft(minutes) +
+                        (minutes >= 0 ? " left" : " past the planned leave time"));
             }
         });
         timeLeftTimer.setInitialDelay(0);
         timeLeftTimer.start();
+    }
+
+    private static String formatMinutesLeft(long minutes) {
+        long hour = 60;
+
+        if (minutes < hour) {
+            return Math.abs(minutes) + " minutes";
+        }
+
+        return (minutes / hour) + ":" + (minutes % hour);
     }
 
     private static void scheduleAdvanceNotices(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
