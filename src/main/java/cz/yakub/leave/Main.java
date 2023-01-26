@@ -42,8 +42,9 @@ public class Main {
 
     private static void waitForAlarm(ZonedDateTime alarmTime) throws InterruptedException {
         int[] advanceNotices = {15, 10, 5, 2};
+        ZonedDateTime now = ZonedDateTime.now();
         for (int i: advanceNotices) {
-            if (alarmTime.minusMinutes(i).isBefore(ZonedDateTime.now())) {
+            if (alarmTime.minusMinutes(i).isBefore(now)) {
                 continue;
             }
 
@@ -55,7 +56,11 @@ public class Main {
     }
 
     private static void sleepUntil(ZonedDateTime alarmTime) throws InterruptedException {
-        long milliseconds = ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS);
+        ZonedDateTime now = ZonedDateTime.now();
+        long milliseconds = now.until(alarmTime, ChronoUnit.MILLIS);
+        if (milliseconds <= 0) {
+            return;
+        }
         Thread.sleep(milliseconds);
     }
 
