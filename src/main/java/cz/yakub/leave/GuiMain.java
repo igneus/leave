@@ -24,6 +24,8 @@ public class GuiMain {
             System.exit(1);
         }
 
+        boolean onAlarmExit = null != System.getProperty("on_alarm_exit");
+
         ZonedDateTime alarmTime = ZonedDateTime.now();
         try {
             alarmTime = (new TimeParser()).parse(args[0]);
@@ -41,12 +43,12 @@ public class GuiMain {
         final ZonedDateTime finalAlarmTime = alarmTime;
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI(finalAlarmTime);
+                createAndShowGUI(finalAlarmTime, onAlarmExit);
             }
         });
     }
 
-    private static void createAndShowGUI(ZonedDateTime alarmTime) {
+    private static void createAndShowGUI(ZonedDateTime alarmTime, boolean onAlarmExit) {
         final SystemTray tray = SystemTray.getSystemTray();
         final IconProvider icons = new IconProvider(tray.getTrayIconSize());
 
@@ -85,7 +87,7 @@ public class GuiMain {
 
         regularlyUpdateTimeLeft(alarmTime, timeLeftItem);
         scheduleAdvanceNotices(alarmTime, trayIcon, icons);
-        scheduleAlarm(alarmTime, trayIcon, icons);
+        scheduleAlarm(alarmTime, trayIcon, icons, onAlarmExit);
         scheduleReminders(alarmTime, trayIcon);
     }
 
@@ -140,12 +142,16 @@ public class GuiMain {
         iconTimer.start();
     }
 
-    private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider) {
+    private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider, boolean onAlarmExit) {
         Timer alarmTimer = new Timer(0, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 trayIcon.setImage(iconProvider.getRed());
                 trayIcon.displayMessage(appName,
                         messages.getString("alarm"), TrayIcon.MessageType.WARNING);
+
+                if (onAlarmExit) {
+                    System.exit(0);
+                }
             }
         });
         alarmTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS));

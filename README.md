@@ -15,7 +15,9 @@ a green icon in the system tray, which at the specified time turns red and bombs
 
 ## Running tests
 
-`$ mvn test`
+`$ mvn test` - unit tests
+
+`$ ./bin/test_edge_cases.sh` - primitive smoke tests for some less common input values
 
 ## License
 

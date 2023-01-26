@@ -19,6 +19,8 @@ public class Main {
             System.exit(1);
         }
 
+        boolean onAlarmExit = null != System.getProperty("on_alarm_exit");
+
         ZonedDateTime alarmTime = ZonedDateTime.now();
         try {
             alarmTime = (new TimeParser()).parse(args[0]);
@@ -30,6 +32,9 @@ public class Main {
 
         waitForAlarm(alarmTime);
         System.out.println(messages.getString("alarm"));
+        if (onAlarmExit) {
+            return;
+        }
         displayReminders();
     }
 
