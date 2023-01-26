@@ -26,8 +26,9 @@ public class GUI {
         final SystemTray tray = SystemTray.getSystemTray();
         final IconProvider icons = new IconProvider(tray.getTrayIconSize());
 
-        final TrayIcon trayIcon =
-                new TrayIcon(icons.getGreen());
+        final TrayIcon trayIcon = new TrayIcon(icons);
+        trayIcon.subscribe(scheduler.getEventHandler());
+
         final PopupMenu popup = new PopupMenu();
         MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");
         popup.add(timeLeftItem);
@@ -89,32 +90,10 @@ public class GUI {
             trayIcon.displayMessage(appName,
                     MessageFormat.format(messages.getString("advance_notice"), event.getMinutesLeft()), TrayIcon.MessageType.INFO);
         });
-
-//        // every minute update the orange icon with current time left
-//        Timer iconTimer = new Timer(minutes(1), null);
-//        iconTimer.addActionListener(new ActionListener() {
-//            private int i = actualAdvanceNotices[0];
-//
-//            public void actionPerformed(ActionEvent e) {
-//                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
-//
-//                i--;
-//                if (i == 0) {
-//                    iconTimer.stop();
-//                }
-//            }
-//        });
-//        iconTimer.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().minusMinutes(actualAdvanceNotices[0]), ChronoUnit.MILLIS));
-//        iconTimer.start();
-
-        // final seconds countdown
-        scheduler.getEventHandler().onEvent(CountdownEvent.class,
-                event -> trayIcon.setImage(iconProvider.getOrange(Integer.toString(event.getSecondsLeft()))));
     }
 
     private void scheduleAlarm(TrayIcon trayIcon, IconProvider iconProvider) {
         scheduler.getEventHandler().onEvent(AlarmEvent.class, event -> {
-            trayIcon.setImage(iconProvider.getRed());
             trayIcon.displayMessage(appName,
                     messages.getString("alarm"), TrayIcon.MessageType.WARNING);
 

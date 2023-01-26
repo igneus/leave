@@ -36,6 +36,10 @@ public class Scheduler {
         timers.add(minuteTickTimer());
     }
 
+    /**
+     * Where listeners can subscribe to events.
+     * @return
+     */
     public IEventHandler getEventHandler() {
         return eventHandler;
     }
