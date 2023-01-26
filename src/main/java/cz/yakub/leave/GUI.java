@@ -1,25 +1,25 @@
 package cz.yakub.leave;
 
+import cz.yakub.leave.event.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class GUI {
     final private static String appName = "leave";
 
     private Model model;
+    private Scheduler scheduler;
     private ResourceBundle messages;
 
     public GUI(Model model, ResourceBundle messages) {
         this.model = model;
         this.messages = messages;
+        this.scheduler = new Scheduler(this.model);
     }
 
     public void run() {
@@ -66,17 +66,12 @@ public class GUI {
     }
 
     private void regularlyUpdateTimeLeft(MenuItem timeLeftItem, TrayIcon trayIcon) {
-        Timer timeLeftTimer = new Timer(minutes(1), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                long minutes = ZonedDateTime.now().until(model.getAlarmTime(), ChronoUnit.MINUTES);
-                String label = formatMinutesLeft(minutes) +
-                        (minutes >= 0 ? " left" : " past the planned leave time");
-                timeLeftItem.setLabel(label);
-                trayIcon.setToolTip(label);
-            }
+        scheduler.getEventHandler().onEvent(MinuteTickEvent.class, event -> {
+            String label = formatMinutesLeft(event.getMinutesLeft()) +
+                    (event.getMinutesLeft() >= 0 ? " left" : " past the planned leave time");
+            timeLeftItem.setLabel(label);
+            trayIcon.setToolTip(label);
         });
-        timeLeftTimer.setInitialDelay(0);
-        timeLeftTimer.start();
     }
 
     private String formatMinutesLeft(long minutes) {
@@ -90,102 +85,49 @@ public class GUI {
     }
 
     private void scheduleAdvanceNotices(TrayIcon trayIcon, IconProvider iconProvider) {
-        int[] advanceNotices = {15, 10, 5, 2}; // TODO: duplicate code
-        int[] actualAdvanceNotices =
-                Arrays.stream(advanceNotices)
-                        .filter(x -> model.getAlarmTime().minusMinutes(x).isAfter(ZonedDateTime.now()))
-                        .toArray();
-
-        if (actualAdvanceNotices.length == 0) {
-            return;
-        }
-
-        for (int i : actualAdvanceNotices) {
-            ZonedDateTime noticeTime = model.getAlarmTime().minusMinutes(i);
-
-            Timer noticeTimer = new Timer(0, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    trayIcon.displayMessage(appName,
-                            MessageFormat.format(messages.getString("advance_notice"), i), TrayIcon.MessageType.INFO);
-                }
-            });
-            noticeTimer.setInitialDelay((int) ZonedDateTime.now().until(noticeTime, ChronoUnit.MILLIS));
-            noticeTimer.setRepeats(false);
-            noticeTimer.start();
-        }
-
-        // every minute update the orange icon with current time left
-        Timer iconTimer = new Timer(minutes(1), null);
-        iconTimer.addActionListener(new ActionListener() {
-            private int i = actualAdvanceNotices[0];
-
-            public void actionPerformed(ActionEvent e) {
-                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
-
-                i--;
-                if (i == 0) {
-                    iconTimer.stop();
-                }
-            }
+        scheduler.getEventHandler().onEvent(AdvanceNoticeEvent.class, event -> {
+            trayIcon.displayMessage(appName,
+                    MessageFormat.format(messages.getString("advance_notice"), event.getMinutesLeft()), TrayIcon.MessageType.INFO);
         });
-        iconTimer.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().minusMinutes(actualAdvanceNotices[0]), ChronoUnit.MILLIS));
-        iconTimer.start();
+
+//        // every minute update the orange icon with current time left
+//        Timer iconTimer = new Timer(minutes(1), null);
+//        iconTimer.addActionListener(new ActionListener() {
+//            private int i = actualAdvanceNotices[0];
+//
+//            public void actionPerformed(ActionEvent e) {
+//                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
+//
+//                i--;
+//                if (i == 0) {
+//                    iconTimer.stop();
+//                }
+//            }
+//        });
+//        iconTimer.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().minusMinutes(actualAdvanceNotices[0]), ChronoUnit.MILLIS));
+//        iconTimer.start();
 
         // final seconds countdown
-        int finalSeconds = 10;
-        Timer iconTimer2 = new Timer((int) Duration.ofSeconds(1).toMillis(), null);
-        iconTimer2.addActionListener(new ActionListener() {
-            private int i = finalSeconds;
-
-            public void actionPerformed(ActionEvent e) {
-                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
-
-                i--;
-                if (i == 0) {
-                    iconTimer2.stop();
-                }
-            }
-        });
-        iconTimer2.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().minusSeconds(finalSeconds), ChronoUnit.MILLIS));
-        iconTimer2.start();
+        scheduler.getEventHandler().onEvent(CountdownEvent.class,
+                event -> trayIcon.setImage(iconProvider.getOrange(Integer.toString(event.getSecondsLeft()))));
     }
 
     private void scheduleAlarm(TrayIcon trayIcon, IconProvider iconProvider) {
-        Timer alarmTimer = new Timer(0, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                trayIcon.setImage(iconProvider.getRed());
-                trayIcon.displayMessage(appName,
-                        messages.getString("alarm"), TrayIcon.MessageType.WARNING);
+        scheduler.getEventHandler().onEvent(AlarmEvent.class, event -> {
+            trayIcon.setImage(iconProvider.getRed());
+            trayIcon.displayMessage(appName,
+                    messages.getString("alarm"), TrayIcon.MessageType.WARNING);
 
-                if (model.isOnAlarmExit()) {
-                    System.exit(0);
-                }
+            if (model.isOnAlarmExit()) {
+                System.exit(0);
             }
         });
-        ZonedDateTime now = ZonedDateTime.now();
-        if (model.getAlarmTime().isAfter(now)) {
-            alarmTimer.setInitialDelay((int) now.until(model.getAlarmTime(), ChronoUnit.MILLIS));
-        }
-        alarmTimer.setRepeats(false);
-        alarmTimer.start();
     }
 
     private void scheduleReminders(TrayIcon trayIcon) {
-        Timer reminderTimer = new Timer(minutes(5), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                long passed = model.getAlarmTime().until(ZonedDateTime.now(), ChronoUnit.MINUTES);
-                trayIcon.displayMessage(appName,
-                        MessageFormat.format(messages.getString("reminder"), passed), TrayIcon.MessageType.WARNING);
-            }
+        scheduler.getEventHandler().onEvent(ReminderEvent.class, event -> {
+            trayIcon.displayMessage(appName,
+                    MessageFormat.format(messages.getString("reminder"), event.getMinutesPassed()), TrayIcon.MessageType.WARNING);
         });
-        reminderTimer.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().plusMinutes(5), ChronoUnit.MILLIS));
-        reminderTimer.start();
-    }
-
-    /**
-     * Computes specified amount of minutes in the format expected by the Timer constructor.
-     */
-    private int minutes(int mins) {
-        return (int) Duration.ofMinutes(mins).toMillis();
     }
 }

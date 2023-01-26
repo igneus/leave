@@ -15,6 +15,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.philippheuer.events4j</groupId>
+            <artifactId>events4j-api</artifactId>
+            <version>0.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.philippheuer.events4j</groupId>
+            <artifactId>events4j-core</artifactId>
+            <version>0.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.philippheuer.events4j</groupId>
+            <artifactId>events4j-handler-simple</artifactId>
+            <version>0.11.0</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13</version>
@@ -36,6 +51,20 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <!-- Include dependencies in the resulting JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
