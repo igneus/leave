@@ -110,6 +110,10 @@ public class GuiMain {
                         .filter(x -> alarmTime.minusMinutes(x).isAfter(ZonedDateTime.now()))
                         .toArray();
 
+        if (actualAdvanceNotices.length == 0) {
+            return;
+        }
+
         for (int i : actualAdvanceNotices) {
             ZonedDateTime noticeTime = alarmTime.minusMinutes(i);
 
@@ -154,7 +158,10 @@ public class GuiMain {
                 }
             }
         });
-        alarmTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime, ChronoUnit.MILLIS));
+        ZonedDateTime now = ZonedDateTime.now();
+        if (alarmTime.isAfter(now)) {
+            alarmTimer.setInitialDelay((int) now.until(alarmTime, ChronoUnit.MILLIS));
+        }
         alarmTimer.setRepeats(false);
         alarmTimer.start();
     }
