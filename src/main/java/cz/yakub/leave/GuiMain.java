@@ -154,6 +154,24 @@ public class GuiMain {
         });
         iconTimer.setInitialDelay((int) ZonedDateTime.now().until(alarmTime.minusMinutes(actualAdvanceNotices[0]), ChronoUnit.MILLIS));
         iconTimer.start();
+
+        // final seconds countdown
+        int finalSeconds = 10;
+        Timer iconTimer2 = new Timer((int) Duration.ofSeconds(1).toMillis(), null);
+        iconTimer2.addActionListener(new ActionListener() {
+            private int i = finalSeconds;
+
+            public void actionPerformed(ActionEvent e) {
+                trayIcon.setImage(iconProvider.getOrange(Integer.toString(i)));
+
+                i--;
+                if (i == 0) {
+                    iconTimer2.stop();
+                }
+            }
+        });
+        iconTimer2.setInitialDelay((int) ZonedDateTime.now().until(alarmTime.minusSeconds(finalSeconds), ChronoUnit.MILLIS));
+        iconTimer2.start();
     }
 
     private static void scheduleAlarm(ZonedDateTime alarmTime, TrayIcon trayIcon, IconProvider iconProvider, boolean onAlarmExit) {
