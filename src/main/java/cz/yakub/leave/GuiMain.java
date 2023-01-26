@@ -85,18 +85,20 @@ public class GuiMain {
             }
         });
 
-        regularlyUpdateTimeLeft(alarmTime, timeLeftItem);
+        regularlyUpdateTimeLeft(alarmTime, timeLeftItem, trayIcon);
         scheduleAdvanceNotices(alarmTime, trayIcon, icons);
         scheduleAlarm(alarmTime, trayIcon, icons, onAlarmExit);
         scheduleReminders(alarmTime, trayIcon);
     }
 
-    private static void regularlyUpdateTimeLeft(ZonedDateTime alarmTime, MenuItem timeLeftItem) {
+    private static void regularlyUpdateTimeLeft(ZonedDateTime alarmTime, MenuItem timeLeftItem, TrayIcon trayIcon) {
         Timer timeLeftTimer = new Timer(minutes(1), new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 long minutes = ZonedDateTime.now().until(alarmTime, ChronoUnit.MINUTES);
-                timeLeftItem.setLabel(formatMinutesLeft(minutes) +
-                        (minutes >= 0 ? " left" : " past the planned leave time"));
+                String label = formatMinutesLeft(minutes) +
+                        (minutes >= 0 ? " left" : " past the planned leave time");
+                timeLeftItem.setLabel(label);
+                trayIcon.setToolTip(label);
             }
         });
         timeLeftTimer.setInitialDelay(0);
