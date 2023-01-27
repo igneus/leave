@@ -30,7 +30,7 @@ public class Scheduler {
         eventManager.registerEventHandler(eventHandler);
 
         timers.add(alarmTimer());
-        timers.addAll(advanceNoticeTimer());
+        timers.addAll(advanceNoticeTimers());
         timers.add(countdownTimer());
         timers.add(remindersTimer());
         timers.add(minuteTickTimer());
@@ -56,7 +56,7 @@ public class Scheduler {
         return timer;
     }
 
-    private Collection<Timer> advanceNoticeTimer() {
+    private Collection<Timer> advanceNoticeTimers() {
         int[] advanceNotices = {15, 10, 5, 2}; // TODO: duplicate code
         int[] actualAdvanceNotices =
                 Arrays.stream(advanceNotices)
