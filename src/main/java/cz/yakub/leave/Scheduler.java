@@ -125,8 +125,12 @@ public class Scheduler implements ChangeListener {
                 }
             }
         });
-        timer.setInitialDelay((int) ZonedDateTime.now().until(model.getAlarmTime().minusSeconds(finalSeconds), ChronoUnit.MILLIS));
-        timer.start();
+
+        ZonedDateTime now = ZonedDateTime.now();
+        if (model.getAlarmTime().isAfter(now)) {
+            timer.setInitialDelay((int) now.until(model.getAlarmTime().minusSeconds(finalSeconds), ChronoUnit.MILLIS));
+            timer.start();
+        }
 
         return timer;
     }
