@@ -6,7 +6,10 @@ import cz.yakub.leave.event.AlarmEvent;
 import cz.yakub.leave.event.CountdownEvent;
 import cz.yakub.leave.event.MinuteTickEvent;
 
-public class TrayIcon extends java.awt.TrayIcon {
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+public class TrayIcon extends java.awt.TrayIcon implements ChangeListener {
     private IconProvider iconProvider;
     private TrayIconState state = TrayIconState.GREEN;
 
@@ -42,5 +45,17 @@ public class TrayIcon extends java.awt.TrayIcon {
             state = TrayIconState.RED;
             setImage(iconProvider.getRed());
         });
+    }
+
+    /**
+     * Where Model reports state changes.
+     * @param changeEvent
+     */
+    @Override
+    public void stateChanged(ChangeEvent changeEvent) {
+        if (changeEvent.getSource() instanceof Model) {
+            state = TrayIconState.GREEN;
+            setImage(iconProvider.getGreen());
+        }
     }
 }

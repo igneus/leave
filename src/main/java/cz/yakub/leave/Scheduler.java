@@ -6,6 +6,8 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import cz.yakub.leave.event.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.Duration;
@@ -18,7 +20,7 @@ import java.util.Collection;
 /**
  * Schedules events relative to the alarm time.
  */
-public class Scheduler {
+public class Scheduler implements ChangeListener {
     private Model model;
     private ArrayList<Timer> timers = new ArrayList<>();
     private EventManager eventManager = new EventManager();
@@ -29,11 +31,7 @@ public class Scheduler {
 
         eventManager.registerEventHandler(eventHandler);
 
-        timers.add(alarmTimer());
-        timers.addAll(advanceNoticeTimers());
-        timers.add(countdownTimer());
-        timers.add(remindersTimer());
-        timers.add(minuteTickTimer());
+        resetTimers();
     }
 
     /**
@@ -42,6 +40,30 @@ public class Scheduler {
      */
     public IEventHandler getEventHandler() {
         return eventHandler;
+    }
+
+    /**
+     * Where Model reports state changes.
+     * @param changeEvent
+     */
+    @Override
+    public void stateChanged(ChangeEvent changeEvent) {
+        if (changeEvent.getSource() != model) {
+            throw new RuntimeException("ChangeEvent from an unexpected source received");
+        }
+
+        resetTimers();
+    }
+
+    private void resetTimers() {
+        timers.forEach(timer -> timer.stop());
+        timers.clear();
+
+        timers.add(alarmTimer());
+        timers.addAll(advanceNoticeTimers());
+        timers.add(countdownTimer());
+        timers.add(remindersTimer());
+        timers.add(minuteTickTimer());
     }
 
     private Timer alarmTimer() {

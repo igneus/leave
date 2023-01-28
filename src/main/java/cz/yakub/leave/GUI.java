@@ -20,6 +20,7 @@ public class GUI {
         this.model = model;
         this.messages = messages;
         this.scheduler = new Scheduler(this.model);
+        this.model.addChangeListener(this.scheduler);
     }
 
     public void run() {
@@ -28,10 +29,13 @@ public class GUI {
 
         final TrayIcon trayIcon = new TrayIcon(icons);
         trayIcon.subscribe(scheduler.getEventHandler());
+        model.addChangeListener(trayIcon);
 
         final PopupMenu popup = new PopupMenu();
         MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");
         popup.add(timeLeftItem);
+        MenuItem settingsItem = new MenuItem("Settings");
+        popup.add(settingsItem);
         MenuItem aboutItem = new MenuItem("About");
         popup.add(aboutItem);
         popup.addSeparator();
@@ -45,6 +49,12 @@ public class GUI {
             System.err.println("TrayIcon could not be added.");
             System.exit(1);
         }
+
+        settingsItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                (new SettingsFrame(appName + " : Settings", model)).setVisible(true);
+            }
+        });
 
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

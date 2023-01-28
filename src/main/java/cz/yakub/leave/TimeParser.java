@@ -27,6 +27,26 @@ public class TimeParser {
         return parseAbsolute(timeString);
     }
 
+    /**
+     * Transforms LocalTime to the next valid alarm time.
+     *
+     * @param time
+     * @return
+     */
+    public ZonedDateTime fromLocalTime(LocalTime time) {
+        ZonedDateTime dateTime =
+                this.currentTime
+                        .withHour(time.getHour())
+                        .withMinute(time.getMinute())
+                        .withSecond(0);
+
+        if (dateTime.isBefore(this.currentTime)) {
+            return dateTime.plusDays(1);
+        }
+
+        return dateTime;
+    }
+
     private ZonedDateTime parseRelative(String timeString) {
         LocalTime parsedTime = parseLocalTime(timeString);
 
@@ -37,18 +57,7 @@ public class TimeParser {
     }
 
     private ZonedDateTime parseAbsolute(String timeString) {
-        LocalTime parsedTime = parseLocalTime(timeString);
-        ZonedDateTime time =
-                this.currentTime
-                        .withHour(parsedTime.getHour())
-                        .withMinute(parsedTime.getMinute())
-                        .withSecond(0);
-
-        if (time.isBefore(this.currentTime)) {
-            return time.plusDays(1);
-        }
-
-        return time;
+        return fromLocalTime(parseLocalTime(timeString));
     }
 
     private LocalTime parseLocalTime(String timeString) {
