@@ -35,6 +35,7 @@ public class GUI {
 
         final PopupMenu popup = new PopupMenu();
         MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");
+        timeLeftItem.setEnabled(false);
         popup.add(timeLeftItem);
         MenuItem settingsItem = new MenuItem("Settings");
         popup.add(settingsItem);
