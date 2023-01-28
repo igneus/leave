@@ -52,7 +52,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>cz.yakub.leave.Main</mainClass>
+                            <mainClass>cz.yakub.leave.GuiMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

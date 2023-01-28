@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-java -cp target/leave-1.0-SNAPSHOT.jar cz.yakub.leave.GuiMain "$@"
+java -jar target/leave-1.0-SNAPSHOT.jar "$@"
