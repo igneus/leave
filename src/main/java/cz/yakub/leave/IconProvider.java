@@ -10,8 +10,12 @@ public class IconProvider {
         this.dimension = dimension;
     }
 
+    public Image getGray() {
+        return create(Color.GRAY);
+    }
+
     public Image getGreen() {
-        return create(new Color(149, 205, 65), "L");
+        return create(new Color(149, 205, 65));
     }
 
     public Image getOrange(String minutesLeft) {
@@ -19,7 +23,7 @@ public class IconProvider {
     }
 
     public Image getRed() {
-        return create(Color.red, "L");
+        return create(Color.red);
     }
 
     private BufferedImage create(Color color, String text) {
@@ -34,5 +38,9 @@ public class IconProvider {
         g2d.dispose();
 
         return bufferedImage;
+    }
+
+    private BufferedImage create(Color color) {
+        return create(color, "L");
     }
 }

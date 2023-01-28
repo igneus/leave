@@ -59,6 +59,10 @@ public class Scheduler implements ChangeListener {
         timers.forEach(timer -> timer.stop());
         timers.clear();
 
+        if (model.getAlarmTime() == null) {
+            return;
+        }
+
         timers.add(alarmTimer());
         timers.addAll(advanceNoticeTimers());
         timers.add(countdownTimer());

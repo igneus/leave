@@ -54,8 +54,13 @@ public class TrayIcon extends java.awt.TrayIcon implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent changeEvent) {
         if (changeEvent.getSource() instanceof Model) {
-            state = TrayIconState.GREEN;
-            setImage(iconProvider.getGreen());
+            if (((Model) changeEvent.getSource()).getAlarmTime() == null) {
+                state = TrayIconState.GRAY;
+                setImage(iconProvider.getGray());
+            } else {
+                state = TrayIconState.GREEN;
+                setImage(iconProvider.getGreen());
+            }
         }
     }
 }

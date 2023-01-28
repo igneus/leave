@@ -11,16 +11,11 @@ public class GuiMain {
     private static ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println(messages.getString("time_missing"));
-            System.exit(1);
-        }
-
         boolean onAlarmExit = null != System.getProperty("on_alarm_exit");
 
-        ZonedDateTime alarmTime = ZonedDateTime.now();
+        ZonedDateTime alarmTime = null;
         try {
-            alarmTime = (new TimeParser()).parse(args[0]);
+            alarmTime = args.length == 0 ? null : (new TimeParser()).parse(args[0]);
         } catch (InvalidTimeStringException e) {
             System.err.println(messages.getString("time_invalid"));
             System.exit(1);
@@ -34,7 +29,6 @@ public class GuiMain {
             System.exit(1);
         }
 
-        final ZonedDateTime finalAlarmTime = alarmTime;
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 (new GUI(model, messages)).run();

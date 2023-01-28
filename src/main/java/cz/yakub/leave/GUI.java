@@ -3,6 +3,7 @@ package cz.yakub.leave;
 import cz.yakub.leave.event.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +31,7 @@ public class GUI {
         final TrayIcon trayIcon = new TrayIcon(icons);
         trayIcon.subscribe(scheduler.getEventHandler());
         model.addChangeListener(trayIcon);
+        trayIcon.stateChanged(new ChangeEvent(model)); // TODO: dirty way to make icon refresh just in case time is null
 
         final PopupMenu popup = new PopupMenu();
         MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");

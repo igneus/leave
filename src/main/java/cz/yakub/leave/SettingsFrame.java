@@ -17,13 +17,13 @@ public class SettingsFrame extends JFrame {
 
         // TODO: display notice if the selected time is past midnight
         TimePicker timePicker = new TimePicker();
-        timePicker.setTime(model.getAlarmTime().toLocalTime());
+        timePicker.setTime(model.getAlarmTime() == null ? null : model.getAlarmTime().toLocalTime());
         add(timePicker);
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(event -> {
             LocalTime time = timePicker.getTime();
-            model.setAlarmTime((new TimeParser()).fromLocalTime(time));
+            model.setAlarmTime(time == null ? null : (new TimeParser()).fromLocalTime(time));
             setVisible(false);
         });
         add(saveButton);
