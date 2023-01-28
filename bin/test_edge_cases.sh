@@ -1,7 +1,7 @@
 #!/bin/bash
 
-run_cli="java -Don_alarm_exit=true -jar target/leave-1.0-SNAPSHOT.jar"
-run_gui="java -Don_alarm_exit=true -cp target/leave-1.0-SNAPSHOT.jar cz.yakub.leave.GuiMain"
+run_cli="java -Don_alarm_exit=true -cp target/leave-1.0-SNAPSHOT.jar cz.yakub.leave.Main"
+run_gui="java -Don_alarm_exit=true -jar target/leave-1.0-SNAPSHOT.jar"
 
 echo "(This test suite takes a few minutes to finish.)"
 
