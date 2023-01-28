@@ -33,18 +33,9 @@ public class GUI {
         model.addChangeListener(trayIcon);
         trayIcon.stateChanged(new ChangeEvent(model)); // TODO: dirty way to make icon refresh just in case time is null
 
-        final PopupMenu popup = new PopupMenu();
-        MenuItem timeLeftItem = new MenuItem("[WILL BE SET BY A TIMER]");
-        timeLeftItem.setEnabled(false);
-        popup.add(timeLeftItem);
-        MenuItem settingsItem = new MenuItem("Settings");
-        popup.add(settingsItem);
-        MenuItem aboutItem = new MenuItem("About");
-        popup.add(aboutItem);
-        popup.addSeparator();
-        MenuItem exitItem = new MenuItem("Exit");
-        popup.add(exitItem);
-        trayIcon.setPopupMenu(popup);
+        final Menu menu = new Menu(appName, model);
+        model.addChangeListener(menu);
+        trayIcon.setPopupMenu(menu);
 
         try {
             tray.add(trayIcon);
@@ -53,37 +44,17 @@ public class GUI {
             System.exit(1);
         }
 
-        settingsItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                (new SettingsFrame(appName + " : Settings", model)).setVisible(true);
-            }
-        });
-
-        aboutItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null,
-                        "'" + appName + "' reminds you to leave in time");
-            }
-        });
-
-        exitItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tray.remove(trayIcon);
-                System.exit(0);
-            }
-        });
-
-        regularlyUpdateTimeLeft(timeLeftItem, trayIcon);
+        regularlyUpdateTimeLeft(menu, trayIcon);
         scheduleAdvanceNotices(trayIcon, icons);
         scheduleAlarm(trayIcon, icons);
         scheduleReminders(trayIcon);
     }
 
-    private void regularlyUpdateTimeLeft(MenuItem timeLeftItem, TrayIcon trayIcon) {
+    private void regularlyUpdateTimeLeft(Menu menu, TrayIcon trayIcon) {
         scheduler.getEventHandler().onEvent(MinuteTickEvent.class, event -> {
             String label = formatMinutesLeft(event.getMinutesLeft()) +
                     (event.getMinutesLeft() >= 0 ? " left" : " past the planned leave time");
-            timeLeftItem.setLabel(label);
+            menu.setTimeLeft(label);
             trayIcon.setToolTip(label);
         });
     }
