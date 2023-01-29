@@ -49,21 +49,11 @@ public class GUI {
 
     private void regularlyUpdateTimeLeft(Menu menu, TrayIcon trayIcon) {
         scheduler.getEventHandler().onEvent(MinuteTickEvent.class, event -> {
-            String label = formatMinutesLeft(event.getMinutesLeft()) +
+            String label = TimeLeftFormatter.format((int) event.getMinutesLeft()) +
                     (event.getMinutesLeft() >= 0 ? " left" : " past the planned leave time");
             menu.setTimeLeft(label);
             trayIcon.setToolTip(label);
         });
-    }
-
-    private String formatMinutesLeft(long minutes) {
-        long hour = 60;
-
-        if (minutes < hour) {
-            return Math.abs(minutes) + " minutes";
-        }
-
-        return (minutes / hour) + ":" + (minutes % hour);
     }
 
     private void scheduleAdvanceNotices(TrayIcon trayIcon, IconProvider iconProvider) {
