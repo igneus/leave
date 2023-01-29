@@ -2,11 +2,8 @@ package cz.yakub.leave;
 
 import cz.yakub.leave.event.*;
 
-import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
